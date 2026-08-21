@@ -21,6 +21,7 @@
                 <th>Description</th>
                 <th>Payment Method</th>
                 <th>Amount</th>
+                <th>Actions</th>
             </tr>
 
             {% for expense in expenses %}
@@ -30,6 +31,11 @@
                 <td>{{ expense["description"] }}</td>
                 <td>{{ expense["payment_method"] }}</td>
                 <td>₹{{ expense["amount"] }}</td>
+                <td>
+                    <a href="{{ url_for('main.edit_expense', expense_id=expense['id']) }}">
+                        Edit
+                    </a>
+                </td>
             </tr>
             {% endfor %}
         </table>

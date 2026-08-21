@@ -47,3 +47,51 @@ def add_expense():
         return redirect(url_for("main.home"))
 
     return render_template("add_expense.html")
+@main.route("/edit/<int:expense_id>", methods=["GET", "POST"])
+def edit_expense(expense_id):
+    connection = get_db_connection()
+
+    expense = connection.execute(
+        "SELECT * FROM expenses WHERE id = ?",
+        (expense_id,),
+    ).fetchone()
+
+    if expense is None:
+        connection.close()
+        return "Expense not found", 404
+
+    if request.method == "POST":
+        amount = request.form["amount"]
+        category = request.form["category"]
+        description = request.form["description"]
+        expense_date = request.form["expense_date"]
+        payment_method = request.form["payment_method"]
+
+        connection.execute(
+            """
+            UPDATE expenses
+            SET amount = ?,
+                category = ?,
+                description = ?,
+                expense_date = ?,
+                payment_method = ?
+            WHERE id = ?
+            """,
+            (
+                amount,
+                category,
+                description,
+                expense_date,
+                payment_method,
+                expense_id,
+            ),
+        )
+
+        connection.commit()
+        connection.close()
+
+        return redirect(url_for("main.home"))
+
+    connection.close()
+
+    return render_template("edit_expense.html", expense=expense)
