@@ -14,7 +14,7 @@ def home():
 
     return render_template("index.html", expenses=expenses)
 
-
+# Add a new expense
 @main.route("/add", methods=["GET", "POST"])
 def add_expense():
     if request.method == "POST":
@@ -48,6 +48,8 @@ def add_expense():
 
     return render_template("add_expense.html")
 @main.route("/edit/<int:expense_id>", methods=["GET", "POST"])
+
+# Edit an expense
 def edit_expense(expense_id):
     connection = get_db_connection()
 
@@ -95,3 +97,18 @@ def edit_expense(expense_id):
     connection.close()
 
     return render_template("edit_expense.html", expense=expense)
+
+# Delete an expense
+@main.route("/delete/<int:expense_id>", methods=["POST"])
+def delete_expense(expense_id):
+    connection = get_db_connection()
+
+    connection.execute(
+        "DELETE FROM expenses WHERE id = ?",
+        (expense_id,),
+    )
+
+    connection.commit()
+    connection.close()
+
+    return redirect(url_for("main.home"))
