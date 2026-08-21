@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Expense</title>
+</head>
+<body>
+
+    <h1>Add Expense</h1>
+
+    <form method="POST">
+
+        <label>Amount:</label><br>
+        <input type="number" name="amount" step="0.01" required>
+        <br><br>
+
+        <label>Category:</label><br>
+        <input type="text" name="category" required>
+        <br><br>
+
+        <label>Description:</label><br>
+        <input type="text" name="description">
+        <br><br>
+
+        <label>Date:</label><br>
+        <input type="date" name="expense_date" required>
+        <br><br>
+
+        <label>Payment Method:</label><br>
+        <select name="payment_method">
+            <option value="Cash">Cash</option>
+            <option value="UPI">UPI</option>
+            <option value="Card">Card</option>
+            <option value="Other">Other</option>
+        </select>
+        <br><br>
+
+        <button type="submit">Add Expense</button>
+
+    </form>
+
+    <br>
+
+    <a href="{{ url_for('main.home') }}">Back to Expenses</a>
+
+</body>
+</html>
