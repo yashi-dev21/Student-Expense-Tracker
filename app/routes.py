@@ -1,5 +1,10 @@
 from collections import defaultdict
 from datetime import date
+import csv
+import io
+
+from flask import Response
+from openpyxl import Workbook
 
 from flask import Blueprint, render_template, request, redirect, url_for
 
@@ -143,8 +148,20 @@ def add_expense():
             errors.append("Amount must be a valid number.")
 
         # Validate category
-        if not category:
-            errors.append("Category is required.")
+        allowed_categories = {
+            "Food",
+            "Travel",
+            "Shopping",
+            "Education",
+            "Bills",
+            "Entertainment",
+            "Health",
+            "Personal",
+            "Other",
+        }
+
+        if category not in allowed_categories:
+            errors.append("Please select a valid category.")
 
         # Validate date
         if not expense_date:
@@ -326,3 +343,163 @@ def delete_expense(expense_id):
     connection.close()
 
     return redirect(url_for("main.home"))
+
+
+# csv and excel export routes
+@main.route("/export/csv")
+def export_csv():
+    search = request.args.get("search", "").strip()
+    category = request.args.get("category", "").strip()
+    payment_method = request.args.get("payment_method", "").strip()
+    start_date = request.args.get("start_date", "").strip()
+    end_date = request.args.get("end_date", "").strip()
+
+    connection = get_db_connection()
+
+    query = "SELECT * FROM expenses WHERE 1=1"
+    parameters = []
+
+    if search:
+        query += " AND (category LIKE ? OR description LIKE ?)"
+        search_value = f"%{search}%"
+        parameters.extend([search_value, search_value])
+
+    if category:
+        query += " AND category = ?"
+        parameters.append(category)
+
+    if payment_method:
+        query += " AND payment_method = ?"
+        parameters.append(payment_method)
+
+    if start_date:
+        query += " AND expense_date >= ?"
+        parameters.append(start_date)
+
+    if end_date:
+        query += " AND expense_date <= ?"
+        parameters.append(end_date)
+
+    query += " ORDER BY expense_date DESC, id DESC"
+
+    expenses = connection.execute(
+        query,
+        parameters
+    ).fetchall()
+
+    connection.close()
+
+    output = io.StringIO()
+
+    writer = csv.writer(output)
+
+    writer.writerow([
+        "Date",
+        "Category",
+        "Description",
+        "Payment Method",
+        "Amount",
+    ])
+
+    for expense in expenses:
+        writer.writerow([
+            expense["expense_date"],
+            expense["category"],
+            expense["description"],
+            expense["payment_method"],
+            expense["amount"],
+        ])
+
+    response = Response(
+        output.getvalue(),
+        mimetype="text/csv",
+    )
+
+    response.headers["Content-Disposition"] = (
+        "attachment; filename=student_expenses.csv"
+    )
+
+    return response
+
+
+@main.route("/export/excel")
+def export_excel():
+    search = request.args.get("search", "").strip()
+    category = request.args.get("category", "").strip()
+    payment_method = request.args.get("payment_method", "").strip()
+    start_date = request.args.get("start_date", "").strip()
+    end_date = request.args.get("end_date", "").strip()
+
+    connection = get_db_connection()
+
+    query = "SELECT * FROM expenses WHERE 1=1"
+    parameters = []
+
+    if search:
+        query += " AND (category LIKE ? OR description LIKE ?)"
+        search_value = f"%{search}%"
+        parameters.extend([search_value, search_value])
+
+    if category:
+        query += " AND category = ?"
+        parameters.append(category)
+
+    if payment_method:
+        query += " AND payment_method = ?"
+        parameters.append(payment_method)
+
+    if start_date:
+        query += " AND expense_date >= ?"
+        parameters.append(start_date)
+
+    if end_date:
+        query += " AND expense_date <= ?"
+        parameters.append(end_date)
+
+    query += " ORDER BY expense_date DESC, id DESC"
+
+    expenses = connection.execute(
+        query,
+        parameters
+    ).fetchall()
+
+    connection.close()
+
+    workbook = Workbook()
+    worksheet = workbook.active
+    worksheet.title = "Expenses"
+
+    worksheet.append([
+        "Date",
+        "Category",
+        "Description",
+        "Payment Method",
+        "Amount",
+    ])
+
+    for expense in expenses:
+        worksheet.append([
+            expense["expense_date"],
+            expense["category"],
+            expense["description"],
+            expense["payment_method"],
+            expense["amount"],
+        ])
+
+    output = io.BytesIO()
+    workbook.save(output)
+    output.seek(0)
+
+    response = Response(
+        output.getvalue(),
+        mimetype=(
+            "application/vnd.openxmlformats-officedocument"
+            ".spreadsheetml.sheet"
+        ),
+    )
+
+    response.headers["Content-Disposition"] = (
+        "attachment; filename=student_expenses.xlsx"
+    )
+
+    return response

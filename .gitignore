@@ -23,3 +23,6 @@ __pycache__/
 
 # Excel/CSV temporary files
 ~$*
+# Exported expense files
+student_expenses.csv
+student_expenses.xlsx

@@ -47,13 +47,55 @@
         <!-- Category -->
         <label for="category">Category:</label><br>
 
-        <input
-            type="text"
-            id="category"
-            name="category"
-            value="{{ expense['category'] }}"
-            required
-        >
+        <select id="category" name="category" required>
+            <option value="">Select a category</option>
+
+            <option value="Food"
+                {% if expense['category'] == 'Food' %}selected{% endif %}>
+                Food
+            </option>
+
+            <option value="Travel"
+                {% if expense['category'] == 'Travel' %}selected{% endif %}>
+                Travel
+            </option>
+
+            <option value="Shopping"
+                {% if expense['category'] == 'Shopping' %}selected{% endif %}>
+                Shopping
+            </option>
+
+            <option value="Education"
+                {% if expense['category'] == 'Education' %}selected{% endif %}>
+                Education
+            </option>
+
+            <option value="Bills"
+                {% if expense['category'] == 'Bills' %}selected{% endif %}>
+                Bills
+            </option>
+
+            <option value="Entertainment"
+                {% if expense['category'] == 'Entertainment' %}selected{% endif %}>
+                Entertainment
+            </option>
+
+            <option value="Health"
+                {% if expense['category'] == 'Health' %}selected{% endif %}>
+                Health
+            </option>
+
+            <option value="Personal"
+                {% if expense['category'] == 'Personal' %}selected{% endif %}>
+                Personal
+            </option>
+
+            <option value="Other"
+                {% if expense['category'] == 'Other' %}selected{% endif %}>
+                Other
+            </option>
+
+        </select>
 
         <br><br>
 
