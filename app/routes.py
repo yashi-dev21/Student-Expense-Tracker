@@ -1,14 +1,23 @@
-from collections import defaultdict
-from datetime import date
 import csv
 import io
 
-from flask import Response
+from collections import defaultdict
+from datetime import date
+
+from flask import (
+    Blueprint,
+    Response,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    flash,
+)
+
 from openpyxl import Workbook
 
-from flask import Blueprint, render_template, request, redirect, url_for
-
 from .db import get_db_connection
+from .services import get_filtered_expenses
 
 
 main = Blueprint("main", __name__)
@@ -16,56 +25,32 @@ main = Blueprint("main", __name__)
 
 @main.route("/")
 def home():
+    # Get filter values from the URL
     search = request.args.get("search", "").strip()
     category = request.args.get("category", "").strip()
     payment_method = request.args.get("payment_method", "").strip()
     start_date = request.args.get("start_date", "").strip()
     end_date = request.args.get("end_date", "").strip()
 
+    # Get filtered expenses using the reusable service function
+    expenses = get_filtered_expenses(
+        search=search,
+        category=category,
+        payment_method=payment_method,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+    # Get available categories for the filter dropdown
     connection = get_db_connection()
 
-    query = "SELECT * FROM expenses WHERE 1=1"
-    parameters = []
-
-    # Search category or description
-    if search:
-        query += " AND (category LIKE ? OR description LIKE ?)"
-        search_value = f"%{search}%"
-        parameters.extend([search_value, search_value])
-
-    # Category filter
-    if category:
-        query += " AND category = ?"
-        parameters.append(category)
-
-    # Payment method filter
-    if payment_method:
-        query += " AND payment_method = ?"
-        parameters.append(payment_method)
-
-    # Start date
-    if start_date:
-        query += " AND expense_date >= ?"
-        parameters.append(start_date)
-
-    # End date
-    if end_date:
-        query += " AND expense_date <= ?"
-        parameters.append(end_date)
-
-    query += " ORDER BY expense_date DESC, id DESC"
-
-    expenses = connection.execute(
-        query,
-        parameters
-    ).fetchall()
-
-    # Get categories for filter dropdown
     categories = connection.execute(
         "SELECT DISTINCT category FROM expenses ORDER BY category"
     ).fetchall()
 
-    # Summary calculations
+    connection.close()
+
+    # Calculate summary values
     total_expenses = sum(
         float(expense["amount"])
         for expense in expenses
@@ -84,13 +69,13 @@ def home():
         average_expense = 0
         highest_expense = 0
 
-    # Spending by category
+    # Calculate spending by category
     category_totals = defaultdict(float)
 
-    # Spending by payment method
+    # Calculate spending by payment method
     payment_totals = defaultdict(float)
 
-    # Spending by month
+    # Calculate spending by month
     monthly_totals = defaultdict(float)
 
     for expense in expenses:
@@ -104,8 +89,7 @@ def home():
 
         monthly_totals[month] += amount
 
-    connection.close()
-
+    # Send everything to the dashboard
     return render_template(
         "index.html",
         expenses=expenses,
@@ -215,6 +199,7 @@ def add_expense():
         connection.commit()
         connection.close()
 
+        flash("Expense added successfully.", "success")
         return redirect(url_for("main.home"))
 
     return render_template(
@@ -318,6 +303,7 @@ def edit_expense(expense_id):
         connection.commit()
         connection.close()
 
+        flash("Expense updated successfully.", "success")
         return redirect(url_for("main.home"))
 
     connection.close()
@@ -342,6 +328,7 @@ def delete_expense(expense_id):
     connection.commit()
     connection.close()
 
+    flash("Expense deleted successfully.", "success")
     return redirect(url_for("main.home"))
 
 
@@ -354,40 +341,13 @@ def export_csv():
     start_date = request.args.get("start_date", "").strip()
     end_date = request.args.get("end_date", "").strip()
 
-    connection = get_db_connection()
-
-    query = "SELECT * FROM expenses WHERE 1=1"
-    parameters = []
-
-    if search:
-        query += " AND (category LIKE ? OR description LIKE ?)"
-        search_value = f"%{search}%"
-        parameters.extend([search_value, search_value])
-
-    if category:
-        query += " AND category = ?"
-        parameters.append(category)
-
-    if payment_method:
-        query += " AND payment_method = ?"
-        parameters.append(payment_method)
-
-    if start_date:
-        query += " AND expense_date >= ?"
-        parameters.append(start_date)
-
-    if end_date:
-        query += " AND expense_date <= ?"
-        parameters.append(end_date)
-
-    query += " ORDER BY expense_date DESC, id DESC"
-
-    expenses = connection.execute(
-        query,
-        parameters
-    ).fetchall()
-
-    connection.close()
+    expenses = get_filtered_expenses(
+        search=search,
+        category=category,
+        payment_method=payment_method,
+        start_date=start_date,
+        end_date=end_date,
+    )
 
     output = io.StringIO()
 
@@ -421,7 +381,6 @@ def export_csv():
 
     return response
 
-
 @main.route("/export/excel")
 def export_excel():
     search = request.args.get("search", "").strip()
@@ -430,42 +389,16 @@ def export_excel():
     start_date = request.args.get("start_date", "").strip()
     end_date = request.args.get("end_date", "").strip()
 
-    connection = get_db_connection()
-
-    query = "SELECT * FROM expenses WHERE 1=1"
-    parameters = []
-
-    if search:
-        query += " AND (category LIKE ? OR description LIKE ?)"
-        search_value = f"%{search}%"
-        parameters.extend([search_value, search_value])
-
-    if category:
-        query += " AND category = ?"
-        parameters.append(category)
-
-    if payment_method:
-        query += " AND payment_method = ?"
-        parameters.append(payment_method)
-
-    if start_date:
-        query += " AND expense_date >= ?"
-        parameters.append(start_date)
-
-    if end_date:
-        query += " AND expense_date <= ?"
-        parameters.append(end_date)
-
-    query += " ORDER BY expense_date DESC, id DESC"
-
-    expenses = connection.execute(
-        query,
-        parameters
-    ).fetchall()
-
-    connection.close()
+    expenses = get_filtered_expenses(
+        search=search,
+        category=category,
+        payment_method=payment_method,
+        start_date=start_date,
+        end_date=end_date,
+    )
 
     workbook = Workbook()
+
     worksheet = workbook.active
     worksheet.title = "Expenses"
 
@@ -487,7 +420,9 @@ def export_excel():
         ])
 
     output = io.BytesIO()
+
     workbook.save(output)
+
     output.seek(0)
 
     response = Response(
