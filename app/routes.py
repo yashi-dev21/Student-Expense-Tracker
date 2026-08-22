@@ -112,12 +112,59 @@ def edit_expense(expense_id):
         return "Expense not found", 404
 
     if request.method == "POST":
-        amount = request.form["amount"]
-        category = request.form["category"]
-        description = request.form["description"]
-        expense_date = request.form["expense_date"]
-        payment_method = request.form["payment_method"]
+        amount = request.form.get("amount", "").strip()
+        category = request.form.get("category", "").strip()
+        description = request.form.get("description", "").strip()
+        expense_date = request.form.get("expense_date", "").strip()
+        payment_method = request.form.get("payment_method", "").strip()
 
+        errors = []
+
+        # Validate amount
+        try:
+            amount_value = float(amount)
+
+            if amount_value <= 0:
+                errors.append("Amount must be greater than 0.")
+
+        except ValueError:
+            errors.append("Amount must be a valid number.")
+
+        # Validate category
+        if not category:
+            errors.append("Category is required.")
+
+        # Validate date
+        if not expense_date:
+            errors.append("Expense date is required.")
+        else:
+            try:
+                selected_date = date.fromisoformat(expense_date)
+
+                if selected_date > date.today():
+                    errors.append("Expense date cannot be in the future.")
+
+            except ValueError:
+                errors.append("Please enter a valid date.")
+
+        # Validate payment method
+        allowed_methods = {"Cash", "UPI", "Card", "Other"}
+
+        if payment_method not in allowed_methods:
+            errors.append("Please select a valid payment method.")
+
+        # Show errors
+        if errors:
+            connection.close()
+
+            return render_template(
+                "edit_expense.html",
+                expense=expense,
+                errors=errors,
+                today=date.today().isoformat(),
+            )
+
+        # Update database
         connection.execute(
             """
             UPDATE expenses
@@ -129,7 +176,7 @@ def edit_expense(expense_id):
             WHERE id = ?
             """,
             (
-                amount,
+                amount_value,
                 category,
                 description,
                 expense_date,
