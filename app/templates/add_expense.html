@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Expense</title>
+    {% if errors %}
+        <div class="errors">
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 </head>
 <body>
 
@@ -24,7 +33,10 @@
         <br><br>
 
         <label>Date:</label><br>
-        <input type="date" name="expense_date" required>
+        <input type="date" name="expense_date" required
+        max="{{ today }}"
+        required
+        >
         <br><br>
 
         <label>Payment Method:</label><br>
