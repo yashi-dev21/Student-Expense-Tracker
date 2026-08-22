@@ -7,6 +7,7 @@ from datetime import date
 from flask import (
     Blueprint,
     Response,
+    abort,
     render_template,
     request,
     redirect,
@@ -179,7 +180,8 @@ def edit_expense(expense_id):
 
     if expense is None:
         connection.close()
-        return "Expense not found", 404
+        from flask import abort
+        abort(404)
 
     if request.method == "POST":
         amount = request.form.get("amount", "").strip()

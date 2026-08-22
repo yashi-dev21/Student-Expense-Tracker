@@ -297,3 +297,23 @@
 .flash-message.error {
     background: #f2f2f2;
 }
+
+.error-page {
+    max-width: 600px;
+    margin: 100px auto;
+    text-align: center;
+    padding: 30px;
+}
+
+.error-page h1 {
+    font-size: 64px;
+    margin-bottom: 10px;
+}
+
+.error-page h2 {
+    margin-bottom: 10px;
+}
+
+.error-page p {
+    margin-bottom: 25px;
+}
