@@ -1,20 +1,126 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from .db import get_db_connection
+from collections import defaultdict
 from datetime import date
+
+from flask import Blueprint, render_template, request, redirect, url_for
+
+from .db import get_db_connection
+
+
 main = Blueprint("main", __name__)
 
 
 @main.route("/")
 def home():
+    search = request.args.get("search", "").strip()
+    category = request.args.get("category", "").strip()
+    payment_method = request.args.get("payment_method", "").strip()
+    start_date = request.args.get("start_date", "").strip()
+    end_date = request.args.get("end_date", "").strip()
+
     connection = get_db_connection()
+
+    query = "SELECT * FROM expenses WHERE 1=1"
+    parameters = []
+
+    # Search category or description
+    if search:
+        query += " AND (category LIKE ? OR description LIKE ?)"
+        search_value = f"%{search}%"
+        parameters.extend([search_value, search_value])
+
+    # Category filter
+    if category:
+        query += " AND category = ?"
+        parameters.append(category)
+
+    # Payment method filter
+    if payment_method:
+        query += " AND payment_method = ?"
+        parameters.append(payment_method)
+
+    # Start date
+    if start_date:
+        query += " AND expense_date >= ?"
+        parameters.append(start_date)
+
+    # End date
+    if end_date:
+        query += " AND expense_date <= ?"
+        parameters.append(end_date)
+
+    query += " ORDER BY expense_date DESC, id DESC"
+
     expenses = connection.execute(
-        "SELECT * FROM expenses ORDER BY expense_date DESC, id DESC"
+        query,
+        parameters
     ).fetchall()
+
+    # Get categories for filter dropdown
+    categories = connection.execute(
+        "SELECT DISTINCT category FROM expenses ORDER BY category"
+    ).fetchall()
+
+    # Summary calculations
+    total_expenses = sum(
+        float(expense["amount"])
+        for expense in expenses
+    )
+
+    expense_count = len(expenses)
+
+    if expense_count > 0:
+        average_expense = total_expenses / expense_count
+
+        highest_expense = max(
+            float(expense["amount"])
+            for expense in expenses
+        )
+    else:
+        average_expense = 0
+        highest_expense = 0
+
+    # Spending by category
+    category_totals = defaultdict(float)
+
+    # Spending by payment method
+    payment_totals = defaultdict(float)
+
+    # Spending by month
+    monthly_totals = defaultdict(float)
+
+    for expense in expenses:
+        amount = float(expense["amount"])
+
+        category_totals[expense["category"]] += amount
+
+        payment_totals[expense["payment_method"]] += amount
+
+        month = expense["expense_date"][:7]
+
+        monthly_totals[month] += amount
+
     connection.close()
 
-    return render_template("index.html", expenses=expenses)
+    return render_template(
+        "index.html",
+        expenses=expenses,
+        categories=categories,
+        search=search,
+        selected_category=category,
+        selected_payment_method=payment_method,
+        start_date=start_date,
+        end_date=end_date,
+        today=date.today().isoformat(),
+        total_expenses=total_expenses,
+        expense_count=expense_count,
+        average_expense=average_expense,
+        highest_expense=highest_expense,
+        category_totals=dict(category_totals),
+        payment_totals=dict(payment_totals),
+        monthly_totals=dict(sorted(monthly_totals.items())),
+    )
 
-# Add a new expense
+
 @main.route("/add", methods=["GET", "POST"])
 def add_expense():
     if request.method == "POST":
@@ -41,7 +147,6 @@ def add_expense():
             errors.append("Category is required.")
 
         # Validate date
-        # Validate date
         if not expense_date:
             errors.append("Expense date is required.")
         else:
@@ -49,18 +154,22 @@ def add_expense():
                 selected_date = date.fromisoformat(expense_date)
 
                 if selected_date > date.today():
-                    errors.append("Expense date cannot be in the future.")
+                    errors.append(
+                        "Expense date cannot be in the future."
+                    )
 
             except ValueError:
                 errors.append("Please enter a valid date.")
 
-                # Validate payment method
-                allowed_methods = {"Cash", "UPI", "Card", "Other"}
+        # Validate payment method
+        allowed_methods = {"Cash", "UPI", "Card", "Other"}
 
-                if payment_method not in allowed_methods:
-                    errors.append("Please select a valid payment method.")
+        if payment_method not in allowed_methods:
+            errors.append(
+                "Please select a valid payment method."
+            )
 
-        # If validation fails
+        # Show validation errors
         if errors:
             return render_template(
                 "add_expense.html",
@@ -96,7 +205,7 @@ def add_expense():
         errors=[],
         today=date.today().isoformat(),
     )
-# Edit an expense
+
 
 @main.route("/edit/<int:expense_id>", methods=["GET", "POST"])
 def edit_expense(expense_id):
@@ -142,7 +251,9 @@ def edit_expense(expense_id):
                 selected_date = date.fromisoformat(expense_date)
 
                 if selected_date > date.today():
-                    errors.append("Expense date cannot be in the future.")
+                    errors.append(
+                        "Expense date cannot be in the future."
+                    )
 
             except ValueError:
                 errors.append("Please enter a valid date.")
@@ -151,9 +262,11 @@ def edit_expense(expense_id):
         allowed_methods = {"Cash", "UPI", "Card", "Other"}
 
         if payment_method not in allowed_methods:
-            errors.append("Please select a valid payment method.")
+            errors.append(
+                "Please select a valid payment method."
+            )
 
-        # Show errors
+        # Show validation errors
         if errors:
             connection.close()
 
@@ -164,7 +277,7 @@ def edit_expense(expense_id):
                 today=date.today().isoformat(),
             )
 
-        # Update database
+        # Update expense
         connection.execute(
             """
             UPDATE expenses
@@ -192,9 +305,14 @@ def edit_expense(expense_id):
 
     connection.close()
 
-    return render_template("edit_expense.html", expense=expense)
+    return render_template(
+        "edit_expense.html",
+        expense=expense,
+        errors=[],
+        today=date.today().isoformat(),
+    )
 
-# Delete an expense
+
 @main.route("/delete/<int:expense_id>", methods=["POST"])
 def delete_expense(expense_id):
     connection = get_db_connection()
