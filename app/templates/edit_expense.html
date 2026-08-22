@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Edit Expense - Student Expense Tracker</title>
+    <title>Edit Expense | Student Expense Tracker</title>
 
     <link
         rel="stylesheet"
@@ -14,174 +15,383 @@
 
 <body>
 
-    <h1>Edit Expense</h1>
+    <div class="form-page">
 
-    {% if errors %}
-        <div class="errors">
-            <ul>
-                {% for error in errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
+        <!-- Header -->
 
-    <form method="POST">
+        <header class="form-header">
 
-        <!-- Amount -->
-        <label for="amount">Amount:</label><br>
-
-        <input
-            type="number"
-            id="amount"
-            name="amount"
-            step="0.01"
-            min="0.01"
-            value="{{ expense['amount'] }}"
-            required
-        >
-
-        <br><br>
-
-
-        <!-- Category -->
-        <label for="category">Category:</label><br>
-
-        <select id="category" name="category" required>
-            <option value="">Select a category</option>
-
-            <option value="Food"
-                {% if expense['category'] == 'Food' %}selected{% endif %}>
-                Food
-            </option>
-
-            <option value="Travel"
-                {% if expense['category'] == 'Travel' %}selected{% endif %}>
-                Travel
-            </option>
-
-            <option value="Shopping"
-                {% if expense['category'] == 'Shopping' %}selected{% endif %}>
-                Shopping
-            </option>
-
-            <option value="Education"
-                {% if expense['category'] == 'Education' %}selected{% endif %}>
-                Education
-            </option>
-
-            <option value="Bills"
-                {% if expense['category'] == 'Bills' %}selected{% endif %}>
-                Bills
-            </option>
-
-            <option value="Entertainment"
-                {% if expense['category'] == 'Entertainment' %}selected{% endif %}>
-                Entertainment
-            </option>
-
-            <option value="Health"
-                {% if expense['category'] == 'Health' %}selected{% endif %}>
-                Health
-            </option>
-
-            <option value="Personal"
-                {% if expense['category'] == 'Personal' %}selected{% endif %}>
-                Personal
-            </option>
-
-            <option value="Other"
-                {% if expense['category'] == 'Other' %}selected{% endif %}>
-                Other
-            </option>
-
-        </select>
-
-        <br><br>
-
-
-        <!-- Description -->
-        <label for="description">Description:</label><br>
-
-        <input
-            type="text"
-            id="description"
-            name="description"
-            value="{{ expense['description'] or '' }}"
-        >
-
-        <br><br>
-
-
-        <!-- Date -->
-        <label for="expense_date">Date:</label><br>
-
-        <input
-            type="date"
-            id="expense_date"
-            name="expense_date"
-            value="{{ expense['expense_date'] }}"
-            max="{{ today }}"
-            required
-        >
-
-        <br><br>
-
-
-        <!-- Payment Method -->
-        <label for="payment_method">Payment Method:</label><br>
-
-        <select
-            id="payment_method"
-            name="payment_method"
-            required
-        >
-
-            <option
-                value="Cash"
-                {% if expense['payment_method'] == 'Cash' %}selected{% endif %}
+            <a
+                href="{{ url_for('main.home') }}"
+                class="back-link"
             >
-                Cash
-            </option>
+                ← Dashboard
+            </a>
 
-            <option
-                value="UPI"
-                {% if expense['payment_method'] == 'UPI' %}selected{% endif %}
+            <div class="form-brand">
+
+                <div class="form-brand-icon">
+                    ₹
+                </div>
+
+                <div>
+                    <h1>Student Expense Tracker</h1>
+                    <p>Making a few changes? No problem. ✨</p>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- Form Card -->
+
+        <main class="expense-form-card">
+
+            <div class="form-title">
+
+                <div>
+
+                    <p class="section-eyebrow">
+                        UPDATE TRANSACTION
+                    </p>
+
+                    <h2>
+                        Edit Expense ✏️
+                    </h2>
+
+                    <p>
+                        Update the details of your expense below.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Validation Errors -->
+
+            {% if errors %}
+
+                <div class="errors">
+
+                    <div class="errors-title">
+                        Please fix the following:
+                    </div>
+
+                    <ul>
+
+                        {% for error in errors %}
+
+                            <li>
+                                {{ error }}
+                            </li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- Edit Form -->
+
+            <form
+                method="POST"
+                class="expense-form"
             >
-                UPI
-            </option>
-
-            <option
-                value="Card"
-                {% if expense['payment_method'] == 'Card' %}selected{% endif %}
-            >
-                Card
-            </option>
-
-            <option
-                value="Other"
-                {% if expense['payment_method'] == 'Other' %}selected{% endif %}
-            >
-                Other
-            </option>
-
-        </select>
-
-        <br><br>
 
 
-        <!-- Submit -->
-        <button type="submit">
-            Update Expense
-        </button>
+                <!-- Amount -->
 
-    </form>
+                <div class="form-field">
 
-    <br>
+                    <label for="amount">
+                        Amount
+                    </label>
 
-    <a href="{{ url_for('main.home') }}">
-        Back to Expenses
-    </a>
+                    <div class="input-with-symbol">
+
+                        <span>
+                            ₹
+                        </span>
+
+                        <input
+                            type="number"
+                            id="amount"
+                            name="amount"
+                            step="0.01"
+                            min="0.01"
+                            value="{{ expense['amount'] }}"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Category -->
+
+                <div class="form-field">
+
+                    <label for="category">
+                        Category
+                    </label>
+
+                    <select
+                        id="category"
+                        name="category"
+                        required
+                    >
+
+                        <option value="">
+                            Select a category
+                        </option>
+
+                        <option
+                            value="Food"
+                            {% if expense['category'] == 'Food' %}
+                                selected
+                            {% endif %}
+                        >
+                            🍔 Food
+                        </option>
+
+                        <option
+                            value="Travel"
+                            {% if expense['category'] == 'Travel' %}
+                                selected
+                            {% endif %}
+                        >
+                            🚕 Travel
+                        </option>
+
+                        <option
+                            value="Shopping"
+                            {% if expense['category'] == 'Shopping' %}
+                                selected
+                            {% endif %}
+                        >
+                            🛍️ Shopping
+                        </option>
+
+                        <option
+                            value="Education"
+                            {% if expense['category'] == 'Education' %}
+                                selected
+                            {% endif %}
+                        >
+                            📚 Education
+                        </option>
+
+                        <option
+                            value="Bills"
+                            {% if expense['category'] == 'Bills' %}
+                                selected
+                            {% endif %}
+                        >
+                            🧾 Bills
+                        </option>
+
+                        <option
+                            value="Entertainment"
+                            {% if expense['category'] == 'Entertainment' %}
+                                selected
+                            {% endif %}
+                        >
+                            🎬 Entertainment
+                        </option>
+
+                        <option
+                            value="Health"
+                            {% if expense['category'] == 'Health' %}
+                                selected
+                            {% endif %}
+                        >
+                            ❤️ Health
+                        </option>
+
+                        <option
+                            value="Personal"
+                            {% if expense['category'] == 'Personal' %}
+                                selected
+                            {% endif %}
+                        >
+                            ✨ Personal
+                        </option>
+
+                        <option
+                            value="Other"
+                            {% if expense['category'] == 'Other' %}
+                                selected
+                            {% endif %}
+                        >
+                            📦 Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Description -->
+
+                <div class="form-field form-field-full">
+
+                    <label for="description">
+
+                        Description
+
+                        <span class="optional">
+                            Optional
+                        </span>
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="description"
+                        name="description"
+                        placeholder="What did you spend on?"
+                        value="{{ expense['description'] or '' }}"
+                        maxlength="200"
+                    >
+
+                </div>
+
+
+                <!-- Date -->
+
+                <div class="form-field">
+
+                    <label for="expense_date">
+                        Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="expense_date"
+                        name="expense_date"
+                        value="{{ expense['expense_date'] }}"
+                        max="{{ today }}"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Payment -->
+
+                <div class="form-field">
+
+                    <label for="payment_method">
+                        Payment Method
+                    </label>
+
+                    <select
+                        id="payment_method"
+                        name="payment_method"
+                        required
+                    >
+
+                        <option value="">
+                            Select payment method
+                        </option>
+
+                        <option
+                            value="Cash"
+                            {% if expense['payment_method'] == 'Cash' %}
+                                selected
+                            {% endif %}
+                        >
+                            💵 Cash
+                        </option>
+
+                        <option
+                            value="UPI"
+                            {% if expense['payment_method'] == 'UPI' %}
+                                selected
+                            {% endif %}
+                        >
+                            📱 UPI
+                        </option>
+
+                        <option
+                            value="Card"
+                            {% if expense['payment_method'] == 'Card' %}
+                                selected
+                            {% endif %}
+                        >
+                            💳 Card
+                        </option>
+
+                        <option
+                            value="Other"
+                            {% if expense['payment_method'] == 'Other' %}
+                                selected
+                            {% endif %}
+                        >
+                            💰 Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Buttons -->
+
+                <div class="form-actions">
+
+                    <a
+                        href="{{ url_for('main.home') }}"
+                        class="form-secondary-btn"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="form-primary-btn"
+                    >
+                        Save Changes
+                    </button>
+
+                </div>
+
+
+            </form>
+
+        </main>
+
+    </div>
+
+
+    <!-- Theme Persistence -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const savedTheme =
+                    localStorage.getItem(
+                        "expenseTrackerTheme"
+                    ) || "lavender";
+
+                document.body.classList.add(
+                    "theme-" + savedTheme
+                );
+
+            }
+        );
+
+    </script>
 
 </body>
+
 </html>

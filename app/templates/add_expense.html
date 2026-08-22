@@ -1,73 +1,389 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Expense</title>
-    {% if errors %}
-        <div class="errors">
-            <ul>
-                {% for error in errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
+
+    <title>Add Expense | Student Expense Tracker</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 </head>
+
 <body>
 
-    <h1>Add Expense</h1>
+    <div class="form-page">
 
-    <form method="POST">
+        <!-- Header -->
 
-        <label>Amount:</label><br>
-        <input type="number" name="amount" step="0.01" required>
-        <br><br>
+        <header class="form-header">
 
-        <label for="category">Category:</label><br>
-        <select id="category" name="category" required>
-            <option value="">Select a category</option>
+            <a
+                href="{{ url_for('main.home') }}"
+                class="back-link"
+            >
+                ← Dashboard
+            </a>
 
-            <option value="Food">Food</option>
-            <option value="Travel">Travel</option>
-            <option value="Shopping">Shopping</option>
-            <option value="Education">Education</option>
-            <option value="Bills">Bills</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Health">Health</option>
-            <option value="Personal">Personal</option>
-            <option value="Other">Other</option>
-        </select>
+            <div class="form-brand">
+                <div class="form-brand-icon">
+                    ₹
+                </div>
 
-        <br><br>
+                <div>
+                    <h1>Student Expense Tracker</h1>
+                    <p>Let's record where your money went. 💸</p>
+                </div>
+            </div>
 
-        <label>Description:</label><br>
-        <input type="text" name="description">
-        <br><br>
+        </header>
 
-        <label>Date:</label><br>
-        <input type="date" name="expense_date" required
-        max="{{ today }}"
-        required
-        >
-        <br><br>
 
-        <label>Payment Method:</label><br>
-        <select name="payment_method">
-            <option value="Cash">Cash</option>
-            <option value="UPI">UPI</option>
-            <option value="Card">Card</option>
-            <option value="Other">Other</option>
-        </select>
-        <br><br>
+        <!-- Form Card -->
 
-        <button type="submit">Add Expense</button>
+        <main class="expense-form-card">
 
-    </form>
+            <div class="form-title">
 
-    <br>
+                <div>
+                    <p class="section-eyebrow">
+                        NEW TRANSACTION
+                    </p>
 
-    <a href="{{ url_for('main.home') }}">Back to Expenses</a>
+                    <h2>
+                        Add an Expense ✨
+                    </h2>
+
+                    <p>
+                        Add the details below to keep your spending organized.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- Validation Errors -->
+
+            {% if errors %}
+
+                <div class="errors">
+
+                    <div class="errors-title">
+                        Please fix the following:
+                    </div>
+
+                    <ul>
+
+                        {% for error in errors %}
+
+                            <li>
+                                {{ error }}
+                            </li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- Expense Form -->
+
+            <form
+                method="POST"
+                class="expense-form"
+            >
+
+                <!-- Amount -->
+
+                <div class="form-field">
+
+                    <label for="amount">
+                        Amount
+                    </label>
+
+                    <div class="input-with-symbol">
+
+                        <span>
+                            ₹
+                        </span>
+
+                        <input
+                            type="number"
+                            id="amount"
+                            name="amount"
+                            step="0.01"
+                            min="0.01"
+                            placeholder="0.00"
+                            value="{{ request.form.get('amount', '') }}"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Category -->
+
+                <div class="form-field">
+
+                    <label for="category">
+                        Category
+                    </label>
+
+                    <select
+                        id="category"
+                        name="category"
+                        required
+                    >
+
+                        <option value="">
+                            Select a category
+                        </option>
+
+                        <option
+                            value="Food"
+                            {% if request.form.get('category') == 'Food' %}
+                                selected
+                            {% endif %}
+                        >
+                            🍔 Food
+                        </option>
+
+                        <option
+                            value="Travel"
+                            {% if request.form.get('category') == 'Travel' %}
+                                selected
+                            {% endif %}
+                        >
+                            🚕 Travel
+                        </option>
+
+                        <option
+                            value="Shopping"
+                            {% if request.form.get('category') == 'Shopping' %}
+                                selected
+                            {% endif %}
+                        >
+                            🛍️ Shopping
+                        </option>
+
+                        <option
+                            value="Education"
+                            {% if request.form.get('category') == 'Education' %}
+                                selected
+                            {% endif %}
+                        >
+                            📚 Education
+                        </option>
+
+                        <option
+                            value="Bills"
+                            {% if request.form.get('category') == 'Bills' %}
+                                selected
+                            {% endif %}
+                        >
+                            🧾 Bills
+                        </option>
+
+                        <option
+                            value="Entertainment"
+                            {% if request.form.get('category') == 'Entertainment' %}
+                                selected
+                            {% endif %}
+                        >
+                            🎬 Entertainment
+                        </option>
+
+                        <option
+                            value="Health"
+                            {% if request.form.get('category') == 'Health' %}
+                                selected
+                            {% endif %}
+                        >
+                            ❤️ Health
+                        </option>
+
+                        <option
+                            value="Personal"
+                            {% if request.form.get('category') == 'Personal' %}
+                                selected
+                            {% endif %}
+                        >
+                            ✨ Personal
+                        </option>
+
+                        <option
+                            value="Other"
+                            {% if request.form.get('category') == 'Other' %}
+                                selected
+                            {% endif %}
+                        >
+                            📦 Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Description -->
+
+                <div class="form-field form-field-full">
+
+                    <label for="description">
+                        Description
+                        <span class="optional">
+                            Optional
+                        </span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="description"
+                        name="description"
+                        placeholder="What did you spend on?"
+                        value="{{ request.form.get('description', '') }}"
+                        maxlength="200"
+                    >
+
+                </div>
+
+
+                <!-- Date -->
+
+                <div class="form-field">
+
+                    <label for="expense_date">
+                        Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="expense_date"
+                        name="expense_date"
+                        value="{{ request.form.get('expense_date', '') }}"
+                        max="{{ today }}"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Payment Method -->
+
+                <div class="form-field">
+
+                    <label for="payment_method">
+                        Payment Method
+                    </label>
+
+                    <select
+                        id="payment_method"
+                        name="payment_method"
+                        required
+                    >
+
+                        <option value="">
+                            Select payment method
+                        </option>
+
+                        <option
+                            value="Cash"
+                            {% if request.form.get('payment_method') == 'Cash' %}
+                                selected
+                            {% endif %}
+                        >
+                            💵 Cash
+                        </option>
+
+                        <option
+                            value="UPI"
+                            {% if request.form.get('payment_method') == 'UPI' %}
+                                selected
+                            {% endif %}
+                        >
+                            📱 UPI
+                        </option>
+
+                        <option
+                            value="Card"
+                            {% if request.form.get('payment_method') == 'Card' %}
+                                selected
+                            {% endif %}
+                        >
+                            💳 Card
+                        </option>
+
+                        <option
+                            value="Other"
+                            {% if request.form.get('payment_method') == 'Other' %}
+                                selected
+                            {% endif %}
+                        >
+                            💰 Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Buttons -->
+
+                <div class="form-actions">
+
+                    <a
+                        href="{{ url_for('main.home') }}"
+                        class="form-secondary-btn"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="form-primary-btn"
+                    >
+                        + Add Expense
+                    </button>
+
+                </div>
+
+            </form>
+
+        </main>
+
+    </div>
+
+
+    <!-- Theme Persistence -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                const savedTheme =
+                    localStorage.getItem(
+                        "expenseTrackerTheme"
+                    ) || "lavender";
+
+                document.body.classList.add(
+                    "theme-" + savedTheme
+                );
+
+            }
+        );
+
+    </script>
 
 </body>
+
 </html>

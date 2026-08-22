@@ -4,8 +4,13 @@ from flask import Flask, render_template
 def create_app():
     app = Flask(__name__)
 
-    app.config["SECRET_KEY"] = "change-this-development-key"
+    import os
 
+    app.config["SECRET_KEY"] = os.environ.get(
+        "SECRET_KEY",
+        "development-secret-key",
+    )
+    
     from .routes import main
     app.register_blueprint(main)
 
