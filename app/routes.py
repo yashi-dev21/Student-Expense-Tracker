@@ -18,6 +18,7 @@ from openpyxl import Workbook
 
 from .db import get_db_connection
 from .services import get_filtered_expenses
+from .validators import validate_expense
 
 
 main = Blueprint("main", __name__)
@@ -119,56 +120,13 @@ def add_expense():
         expense_date = request.form.get("expense_date", "").strip()
         payment_method = request.form.get("payment_method", "").strip()
 
-        errors = []
-
-        # Validate amount
-        try:
-            amount_value = float(amount)
-
-            if amount_value <= 0:
-                errors.append("Amount must be greater than 0.")
-
-        except ValueError:
-            errors.append("Amount must be a valid number.")
-
-        # Validate category
-        allowed_categories = {
-            "Food",
-            "Travel",
-            "Shopping",
-            "Education",
-            "Bills",
-            "Entertainment",
-            "Health",
-            "Personal",
-            "Other",
-        }
-
-        if category not in allowed_categories:
-            errors.append("Please select a valid category.")
-
-        # Validate date
-        if not expense_date:
-            errors.append("Expense date is required.")
-        else:
-            try:
-                selected_date = date.fromisoformat(expense_date)
-
-                if selected_date > date.today():
-                    errors.append(
-                        "Expense date cannot be in the future."
-                    )
-
-            except ValueError:
-                errors.append("Please enter a valid date.")
-
-        # Validate payment method
-        allowed_methods = {"Cash", "UPI", "Card", "Other"}
-
-        if payment_method not in allowed_methods:
-            errors.append(
-                "Please select a valid payment method."
-            )
+        # Validate the expense data
+        errors, amount_value = validate_expense(
+            amount=amount,
+            category=category,
+            expense_date=expense_date,
+            payment_method=payment_method,
+        )
 
         # Show validation errors
         if errors:
@@ -178,7 +136,7 @@ def add_expense():
                 today=date.today().isoformat(),
             )
 
-        # Save valid expense
+        # Save valid expense to database
         connection = get_db_connection()
 
         connection.execute(
@@ -200,6 +158,7 @@ def add_expense():
         connection.close()
 
         flash("Expense added successfully.", "success")
+
         return redirect(url_for("main.home"))
 
     return render_template(
@@ -229,44 +188,13 @@ def edit_expense(expense_id):
         expense_date = request.form.get("expense_date", "").strip()
         payment_method = request.form.get("payment_method", "").strip()
 
-        errors = []
-
-        # Validate amount
-        try:
-            amount_value = float(amount)
-
-            if amount_value <= 0:
-                errors.append("Amount must be greater than 0.")
-
-        except ValueError:
-            errors.append("Amount must be a valid number.")
-
-        # Validate category
-        if not category:
-            errors.append("Category is required.")
-
-        # Validate date
-        if not expense_date:
-            errors.append("Expense date is required.")
-        else:
-            try:
-                selected_date = date.fromisoformat(expense_date)
-
-                if selected_date > date.today():
-                    errors.append(
-                        "Expense date cannot be in the future."
-                    )
-
-            except ValueError:
-                errors.append("Please enter a valid date.")
-
-        # Validate payment method
-        allowed_methods = {"Cash", "UPI", "Card", "Other"}
-
-        if payment_method not in allowed_methods:
-            errors.append(
-                "Please select a valid payment method."
-            )
+        # Validate the expense data
+        errors, amount_value = validate_expense(
+            amount=amount,
+            category=category,
+            expense_date=expense_date,
+            payment_method=payment_method,
+        )
 
         # Show validation errors
         if errors:
@@ -279,7 +207,7 @@ def edit_expense(expense_id):
                 today=date.today().isoformat(),
             )
 
-        # Update expense
+        # Update expense in database
         connection.execute(
             """
             UPDATE expenses
@@ -304,6 +232,7 @@ def edit_expense(expense_id):
         connection.close()
 
         flash("Expense updated successfully.", "success")
+
         return redirect(url_for("main.home"))
 
     connection.close()
@@ -314,7 +243,6 @@ def edit_expense(expense_id):
         errors=[],
         today=date.today().isoformat(),
     )
-
 
 @main.route("/delete/<int:expense_id>", methods=["POST"])
 def delete_expense(expense_id):
