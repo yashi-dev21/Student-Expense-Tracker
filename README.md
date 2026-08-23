@@ -84,7 +84,9 @@ Users can customize the dashboard with:
 
 ## 📁 Project Structure
 
+```text
 Student-Expense-Tracker/
+│
 ├── app/
 │   ├── __init__.py
 │   ├── constants.py
@@ -92,11 +94,26 @@ Student-Expense-Tracker/
 │   ├── routes.py
 │   ├── services.py
 │   ├── validators.py
+│   │
 │   ├── templates/
+│   │   ├── index.html
+│   │   ├── add_expense.html
+│   │   ├── edit_expense.html
+│   │   ├── 404.html
+│   │   └── 500.html
+│   │
 │   └── static/
+│       └── style.css
+│
 ├── data/
+│
 ├── docs/
 │   └── screenshots/
+│       ├── dashboard.png
+│       ├── theme-selector.png
+│       ├── Expenses.png
+│       └── analytics.png
+│
 ├── .gitignore
 ├── .python-version
 ├── README.md
