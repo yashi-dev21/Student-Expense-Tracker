@@ -82,8 +82,6 @@ Users can customize the dashboard with:
 | GitHub | Source code hosting |
 | Render | Deployment |
 
-                                                                
-
 ## 📸 Screenshots
 
 ### Dashboard
@@ -104,7 +102,7 @@ Users can customize the dashboard with:
 
 ## 📁 Project Structure
 
-
+<pre>
 Student-Expense-Tracker/
 │
 ├── app/
@@ -138,7 +136,98 @@ Student-Expense-Tracker/
 ├── .python-version
 ├── README.md
 ├── requirements.txt
-└── run.py 
+└── run.py
+</pre>
+
+## ⚙️ Run Locally
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/yashi-dev21/Student-Expense-Tracker.git
+cd Student-Expense-Tracker
+```
+
+### 2. Create a virtual environment
+
+```powershell
+py -3.11 -m venv .venv
+```
+
+### 3. Activate the virtual environment
+
+```powershell
+.\.venv\Scripts\activate
+```
+
+### 4. Install dependencies
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+### 5. Run the application
+
+```powershell
+python run.py
+```
+
+Open:
+
+```text
+http://127.0.0.1:5000
+```
+
+## 🔄 Application Flow
+
+```text
+User
+  ↓
+Flask Routes
+  ↓
+Validation
+  ↓
+Services
+  ↓
+SQLite Database
+  ↓
+Analytics
+  ↓
+Dashboard / Charts
+```
+
+## 🧠 What I Learned
+
+This project helped me work with:
+
+- Flask application structure
+- Python virtual environments
+- SQLite and SQL queries
+- CRUD operations
+- Input validation
+- Reusable service functions
+- Data filtering
+- Data aggregation
+- Chart.js
+- CSV and Excel generation
+- Git and GitHub
+- Environment variables
+- Web deployment
+- Responsive frontend design
+
+## 🚀 Future Improvements
+
+Planned Version 2 improvements:
+
+- PostgreSQL database
+- User authentication
+- User-specific expense dashboards
+- Monthly budgets
+- Budget alerts
+- Recurring expenses
+- PDF export
+- Advanced analytics
+- Persistent production database
 
 ## 👩‍💻 Author
 
