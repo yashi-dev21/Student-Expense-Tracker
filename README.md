@@ -14,6 +14,7 @@ https://student-expense-tracker-c8bl.onrender.com
 ## ✨ Features
 
 ### Expense Management
+
 - Add expenses
 - View expenses
 - Edit expenses
@@ -23,6 +24,7 @@ https://student-expense-tracker-c8bl.onrender.com
 - Future-date prevention
 
 ### Search & Filters
+
 - Search by category or description
 - Filter by category
 - Filter by payment method
@@ -30,6 +32,7 @@ https://student-expense-tracker-c8bl.onrender.com
 - Combine multiple filters
 
 ### Analytics Dashboard
+
 - Total spending
 - Number of transactions
 - Average expense
@@ -40,10 +43,12 @@ https://student-expense-tracker-c8bl.onrender.com
 - Interactive Chart.js visualizations
 
 ### Export
+
 - Export filtered expenses to CSV
 - Export filtered expenses to Excel
 
 ### UI / UX
+
 - Responsive dashboard
 - Collapsible search/filter panel
 - Four selectable color themes
@@ -79,9 +84,7 @@ Users can customize the dashboard with:
 
 ## 📁 Project Structure
 
-```text
 Student-Expense-Tracker/
-│
 ├── app/
 │   ├── __init__.py
 │   ├── constants.py
@@ -89,26 +92,16 @@ Student-Expense-Tracker/
 │   ├── routes.py
 │   ├── services.py
 │   ├── validators.py
-│   │
 │   ├── templates/
-│   │   ├── index.html
-│   │   ├── add_expense.html
-│   │   ├── edit_expense.html
-│   │   ├── 404.html
-│   │   └── 500.html
-│   │
 │   └── static/
-│       └── style.css
-│
 ├── data/
-│   └── expenses.db
-│
+├── docs/
+│   └── screenshots/
 ├── .gitignore
 ├── .python-version
 ├── README.md
 ├── requirements.txt
 └── run.py
-
 
 ## 📸 Screenshots
 
@@ -127,7 +120,6 @@ Student-Expense-Tracker/
 ### Analytics
 
 ![Analytics](docs/screenshots/analytics.png)
-
 
 ## 👩‍💻 Author
 
