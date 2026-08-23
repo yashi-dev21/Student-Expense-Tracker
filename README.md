@@ -82,9 +82,29 @@ Users can customize the dashboard with:
 | GitHub | Source code hosting |
 | Render | Deployment |
 
+                                                                
+
+## 📸 Screenshots
+
+### Dashboard
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+### Theme Selector
+
+![Theme Selector](docs/screenshots/theme-selector.png)
+
+### Add Expense
+
+![Add Expense](docs/screenshots/Expenses.png)
+
+### Analytics
+
+![Analytics](docs/screenshots/analytics.png)
+
 ## 📁 Project Structure
 
-```text
+
 Student-Expense-Tracker/
 │
 ├── app/
@@ -118,25 +138,7 @@ Student-Expense-Tracker/
 ├── .python-version
 ├── README.md
 ├── requirements.txt
-└── run.py
-
-## 📸 Screenshots
-
-### Dashboard
-
-![Dashboard](docs/screenshots/dashboard.png)
-
-### Theme Selector
-
-![Theme Selector](docs/screenshots/theme-selector.png)
-
-### Add Expense
-
-![Add Expense](docs/screenshots/Expenses.png)
-
-### Analytics
-
-![Analytics](docs/screenshots/analytics.png)
+└── run.py 
 
 ## 👩‍💻 Author
 
